@@ -50,11 +50,20 @@ def get_matching_s3_keys(bucket, prefix=None):
 
 
 def make_prefixes(product, date_range=None, date_time=None, bands=None):
+    """
+    Generate the prefixes for GOES files contained via s3 keys for a given date or date range, bands, and product.
+
+    :param product: The GOES product we are targeting; accepts a string.
+    :param date_range: A list of dates we want to download GOES data from; accepts lists of datetimes.
+    :param date_time: A date we want to download GOES data from; accepts datetime instances.
+    :param bands: The bands from the GOES data we're expecting; accepts instances of ints and lists of ints.
+    """
+
     # Validate
     if bands is not None:
         if isinstance(bands, int):
             bands = [bands]
-        elif isinstance(bands, list):
+        elif isinstance(bands, list) and isinstance(bands[0], int):
                 bands = bands
         else:
             raise ValueError("You need to pass either type list or int for param bands.")
@@ -68,7 +77,7 @@ def make_prefixes(product, date_range=None, date_time=None, bands=None):
         raise ValueError("You need to pass either a date_range OR date_time; please pass only one through.")
 
     if date_range is not None:
-        if isinstance(date_range[0], datetime.datetime):
+        if isinstance(date_range[0], datetime.datetime) and isinstance(date_range, list):
             date_range = date_range
         else:
             raise ValueError("The date_range is not a list of type datetimes; please reformat param.")

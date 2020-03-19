@@ -58,11 +58,11 @@ def goes_threshold(
 
     Usage: `label goes-threshold 2019-01-01 2019-01-02 --satellite=noaa-goes16`
     """
-    comm = MPI.COMM_WORLD
+    comm = MPI.COMM_WORLD  # pylint: disable=c-extension-no-member
     process_rank = comm.Get_rank()
     num_processes = comm.Get_size()
 
-    scan_filepaths_grouped = None
+    scan_filepaths = None
 
     if process_rank == 0:
         if download:
@@ -86,9 +86,6 @@ def goes_threshold(
                 comm.Abort()
 
         scan_filepaths = utilities.group_filepaths_into_scans(filepaths=filepaths)
-        scan_filepaths_grouped = np.array_split(
-            scan_filepaths, indices_or_sections=num_processes
-        )
         _logger.info(
             """Labeling wildfires from GOES data with the threshold model.
 Parameters:
@@ -109,8 +106,9 @@ Parameters:
             num_processes,
             len(scan_filepaths),
         )
+        scan_filepaths = np.array_split(scan_filepaths, indices_or_sections=num_processes)
 
-    scan_filepaths = comm.scatter(scan_filepaths_grouped)
+    scan_filepaths = comm.scatter(scan_filepaths)
     wildfires = [
         wildfire.parse_scan_for_wildfire(scan_filepath)
         for scan_filepath in scan_filepaths
@@ -118,11 +116,11 @@ Parameters:
     wildfires = list(filter(None, wildfires))
     _logger.info("Found %d wildfires.", len(wildfires))
 
-    all_wildfires = comm.gather(wildfires)
+    wildfires = comm.gather(wildfires)
 
     if process_rank == 0:
-        all_wildfires = utilities.flatten_array(all_wildfires)
-        if len(all_wildfires) > 0:
+        wildfires = utilities.flatten_array(wildfires)
+        if len(wildfires) > 0:
             wildfires_filepath = os.path.join(
                 wildfire_directory,
                 WILDFIRE_FILENAME.format(
@@ -135,7 +133,7 @@ Parameters:
             )
             _logger.info("Persisting wildfires to %s", wildfires_filepath)
             with open(wildfires_filepath, "w+") as buffer:
-                json.dump(dict(enumerate(all_wildfires)), buffer)
+                json.dump(dict(enumerate(wildfires)), buffer)
         else:
             _logger.info("No wildfires found...")
 

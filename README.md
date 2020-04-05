@@ -37,6 +37,7 @@ an isolated python environment. Below are several usefule commands for doing so 
 1. `pip install -r requirements.txt` to install dependencies
 1. `conda install mpi4py torch cudatoolkit`
 1. `pip install -r requirements-dev.in` to install test dependencies
+1. `conda install pytorch cudnn` to install deep learning dependencies (add to requirements file?)
 1. `scripts/test-it` to verify installation
 
 ### Requirements

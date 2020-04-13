@@ -7,5 +7,5 @@ set -euxo pipefail
 
 pip install -r requirements.txt
 pip install -r requirements-dev.in
-# conda install mpi4py -y
+conda install mpi4py -y
 python setup.py install

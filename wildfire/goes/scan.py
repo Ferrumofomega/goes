@@ -181,9 +181,9 @@ class GoesScan:
         """Scale all bands to 500 meters.
 
         The spatial resolution is band-dependent:
-            500 m: bands 4, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
+            2 km: bands 4, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
             1 km: bands 1, 3, 5
-            2 km: band 2
+            500 m: band 2
 
         To perform any operation comparing data from different bands, it may be important
         to first rescale the bands of interest to the same spatial resolution.
@@ -197,7 +197,7 @@ class GoesScan:
         Returns
         -------
         GoesScan
-            A `GoesScan` object where each band has been spatially rescaled to 500 meters.
+            A `GoesScan` object where each band has been spatially rescaled to 2 km.
         """
         rescaled_datasets = [band.rescale_to_2km() for _, band in self.iteritems()]
         return GoesScan(bands=rescaled_datasets)

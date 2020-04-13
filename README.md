@@ -45,11 +45,8 @@ or the environment variables `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` set
 1. Make sure that all requirements above are installed
 1. `cp .sample_env .env` and fill out any `<>` blocks
 1. `set -o allexport && source .env && set +o allexport` to export environment variables
-1. `pip install -r requirements.txt` to install dependencies
-1. `conda install mpi4py`
-1. `pip install -r requirements-dev.in` to install test dependencies
-1. `scripts/test-it` to verify installation
-1. `python setup.py install` to install the package
+1. `scripts/install` to install package and dependencies
+1. `scripts/test-it` to verify install
 
 ## Entry Points
 

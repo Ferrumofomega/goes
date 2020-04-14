@@ -13,8 +13,6 @@ jobs:
     - name: Set up virtual environment
       uses: goanpeca/setup-miniconda@v1
       with:
-        auto-activate-base: false
-        python-version: 3.7
         environment-file: environment.yml
         activate-environment: wildfire3.7
     - name: Linting, unit, and integration tests

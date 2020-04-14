@@ -5,7 +5,7 @@ set -euxo pipefail
 # -x print each command run to stdout
 # -o pipefail return the error status of the last command to exit
 
-pip install -r requirements.txt
-pip install -r requirements-dev.in
-conda install mpi4py torch cudatoolkit pytorch cudnn -y
+conda env create -f environment.yml
+conda activate wildfire3.7
 python setup.py install
+callisto --path=$PWD

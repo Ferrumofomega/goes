@@ -45,7 +45,7 @@ or the environment variables `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` set
 1. Make sure that all requirements above are installed
 1. `cp .sample_env .env` and fill out any `<>` blocks
 1. `set -o allexport && source .env && set +o allexport` to export environment variables
-1. `source scripts/set_up_environment` to install package and dependencies
+1. `source scripts/create-env` to install package and dependencies
 1. `scripts/test-it` to verify install
 
 ## Entry Points

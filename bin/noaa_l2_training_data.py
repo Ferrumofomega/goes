@@ -28,7 +28,7 @@ patch_size = 32
 fire_path = '/nobackupp10/tvandal/data/goes16/ABI-L2-FDCF/{}/{}/{}/'
 ABI_directory = '/nex/datapool/geonex/public/GOES16/NOAA-L1B/'
 
-training_directory = './.tmp/training-data/abi-noaal1b-F/'
+training_directory = '/nobackup/cpiho/wildfire/.tmp/training-data/abi-noaal1b-F/'
 
 if not os.path.exists(training_directory):
     os.makedirs(training_directory)

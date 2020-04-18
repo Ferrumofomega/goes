@@ -15,10 +15,12 @@ jobs:
       with:
         environment-file: environment.yml
         activate-environment: wildfire3.7
+        auto-activate-base: false
+      run: conda list
     - name: Linting, unit, and integration tests
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       run: |
-        source activate wildfire3.7
+        conda info --envs
         scripts/test-it

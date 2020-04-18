@@ -10,6 +10,7 @@ import numpy as np
 import tqdm
 
 SATELLITE_SHORT_HAND = {"noaa-goes16": "G16", "noaa-goes17": "G17"}
+SATELLITE_LONG_HAND = {"G16": "noaa-goes16", "G17": "noaa-goes17"}
 BASE_PATTERN_FORMAT = os.path.join(
     "{directory}",
     "ABI-L1b-Rad{region[0]}",
@@ -361,4 +362,5 @@ def starmap_function(function, function_args, flatten=False):
 
 
 def flatten_array(list_2d):
+    """Flatten 2d list to 1 dimension."""
     return [item for list_1d in list_2d for item in list_1d]

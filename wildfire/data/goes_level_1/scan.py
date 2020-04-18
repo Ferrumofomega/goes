@@ -86,7 +86,7 @@ class GoesScan:
     Attributes
     ----------
     bands : dict
-        {"band_{idx}": wildfire.goes.band.GoesBand},
+        {"band_{idx}": wildfire.data.goes_level_1.GoesBand},
         where `idx` are the integers between 1 and 16 inclusive and ordered from least
         to greatest by `idx`.
     scan_time_utc : datetime.datetime
@@ -104,12 +104,12 @@ class GoesScan:
 
         Parameters
         ----------
-        bands : list of wildfire.goes.band.GoesBand
+        bands : list of wildfire.data.goes_level_1.GoesBand
 
         Raises
         ------
         ValueError
-            If `bands` is not of type `list of wildfire.goes.band.GoesBand` or if `bands`
+            If `bands` is not of type `list of wildfire.data.goes_level_1.GoesBand` or if `bands`
             is not of length 16, with one element for each band scanned.
         """
         self.bands = self._parse_input(bands=bands)
@@ -135,7 +135,7 @@ class GoesScan:
 
         Returns
         -------
-        wildfire.goes.band.GoesBand
+        wildfire.data.goes_level_1.GoesBand
         """
         return self.bands[key]
 
@@ -149,13 +149,13 @@ class GoesScan:
 
         Parameters
         ----------
-        bands : list of wildfire.goes.band.GoesBand
+        bands : list of wildfire.data.goes_level_1.GoesBand
 
         Returns
         -------
         dict
             Of the form:
-                {str: wildfire.goes.band.GoesBand}
+                {str: wildfire.data.goes_level_1.GoesBand}
             A dictionary of GOES satellite data, ordered by band number from smallest to
             greatest.
         """
@@ -178,7 +178,7 @@ class GoesScan:
         return self.bands.items()
 
     def rescale_to_2km(self):
-        """Scale all bands to 500 meters.
+        """Scale all bands to 2 kilometers.
 
         The spatial resolution is band-dependent:
             2 km: bands 4, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
@@ -192,15 +192,27 @@ class GoesScan:
         -----
         We are currently ignoring the fact that after rescaling the X and Y coordinates
         across the different bands don't correspond. We rely on the fact that they are
-        close enough to each other, however, this could open up problems in the future.
+        close enough to each other such that they can be appoximated by the coordinates
+        of a 2km band (namely band 16), however, this could open up problems in the
+        future.
 
         Returns
         -------
         GoesScan
             A `GoesScan` object where each band has been spatially rescaled to 2 km.
         """
-        rescaled_datasets = [band.rescale_to_2km() for _, band in self.iteritems()]
-        return GoesScan(bands=rescaled_datasets)
+        band_16_coords = {
+            "x": self["band_16"].dataset.x.values,
+            "y": self["band_16"].dataset.y.values,
+        }
+        return GoesScan(
+            bands=[
+                band.GoesBand(
+                    band_ds.rescale_to_2km().dataset.assign_coords(**band_16_coords)
+                )
+                for _, band_ds in self.iteritems()
+            ]
+        )
 
     def to_netcdf(self, directory):
         """Persist a netcdf4 per band.

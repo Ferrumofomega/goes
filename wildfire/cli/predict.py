@@ -1,4 +1,7 @@
-"""This module uses mpi4py so that it can also be distributed across compute nodes."""
+"""Create model predictions.
+
+This module uses mpi4py so that it can also be distributed across compute nodes.
+"""
 import datetime
 import json
 import logging
@@ -9,7 +12,7 @@ from mpi4py import MPI
 import numpy as np
 
 from wildfire import wildfire
-from wildfire.goes import downloader, utilities
+from wildfire.data import goes_level_1
 
 DATETIME_FORMATS = ["%Y-%m-%dT%H:%M:%S", "%Y-%m-%d"]
 WILDFIRE_FILENAME = "wildfires_{satellite}_{region}_s{start}_e{end}_c{created}.json"
@@ -19,11 +22,12 @@ _logger = logging.getLogger(__name__)
 
 
 @click.group()
-def label():
+def predict():
+    """Use the wildfire models to predict."""
     pass
 
 
-@label.command()
+@predict.command()
 @click.argument("start", type=click.DateTime(formats=DATETIME_FORMATS))
 @click.argument("end", type=click.DateTime(formats=DATETIME_FORMATS))
 @click.option(
@@ -56,9 +60,9 @@ def goes_threshold(
 ):
     """Label wildfires in GOES Level 1b data.
 
-    Usage: `label goes-threshold 2019-01-01 2019-01-02 --satellite=noaa-goes16`
+    Usage: `mpirun -np 32 predict goes-threshold 2019-01-01 2019-01-02`
     """
-    comm = MPI.COMM_WORLD  # pylint: disable=c-extension-no-member
+    comm = MPI.COMM_WORLD
     process_rank = comm.Get_rank()
     num_processes = comm.Get_size()
 
@@ -66,7 +70,7 @@ def goes_threshold(
 
     if process_rank == 0:
         if download:
-            filepaths = downloader.download_files(
+            filepaths = goes_level_1.downloader.download_files(
                 local_directory=goes_directory,
                 satellite=satellite,
                 region=region,
@@ -74,7 +78,7 @@ def goes_threshold(
                 end_time=end,
             )
         else:
-            filepaths = utilities.list_local_files(
+            filepaths = goes_level_1.utilities.list_local_files(
                 local_directory=goes_directory,
                 satellite=satellite,
                 region=region,
@@ -85,7 +89,9 @@ def goes_threshold(
                 _logger.error("No local files found...")
                 comm.Abort()
 
-        scan_filepaths = utilities.group_filepaths_into_scans(filepaths=filepaths)
+        scan_filepaths = goes_level_1.utilities.group_filepaths_into_scans(
+            filepaths=filepaths
+        )
         _logger.info(
             """Labeling wildfires from GOES data with the threshold model.
 Parameters:
@@ -119,7 +125,7 @@ Parameters:
     wildfires = comm.gather(wildfires)
 
     if process_rank == 0:
-        wildfires = utilities.flatten_array(wildfires)
+        wildfires = goes_level_1.utilities.flatten_array(wildfires)
         if len(wildfires) > 0:
             wildfires_filepath = os.path.join(
                 wildfire_directory,
@@ -140,6 +146,7 @@ Parameters:
         _logger.info("Success.")
 
 
-@label.command
+@predict.command
 def goes_deep():
+    """Not yet implemented."""
     pass

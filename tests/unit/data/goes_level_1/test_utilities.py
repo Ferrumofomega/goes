@@ -6,7 +6,7 @@ import time
 
 import numpy as np
 
-from wildfire.goes import utilities
+from wildfire.data.goes_level_1 import utilities
 
 
 def test_parse_filename():

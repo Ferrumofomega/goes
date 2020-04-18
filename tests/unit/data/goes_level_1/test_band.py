@@ -6,12 +6,11 @@ import numpy as np
 import scipy.stats as st
 import xarray as xr
 
-from wildfire import goes
-from wildfire.goes.band import normalize
+from wildfire.data import goes_level_1
 
 
 def test_goes_band(reflective_band):
-    actual = goes.GoesBand(dataset=reflective_band)
+    actual = goes_level_1.GoesBand(dataset=reflective_band)
     assert actual.region == "M1"
     assert actual.satellite == "G17"
     np.testing.assert_almost_equal(actual.band_wavelength_micrometers, 0.47, decimal=0)
@@ -35,7 +34,7 @@ def test_goes_band(reflective_band):
 
 
 def test_reflective_band(reflective_band):
-    actual = goes.GoesBand(dataset=reflective_band)
+    actual = goes_level_1.GoesBand(dataset=reflective_band)
     assert actual.parse().equals(actual.reflectance_factor)
     assert np.isnan(actual.reflectance_factor.data).sum() == 0
     np.testing.assert_array_equal(
@@ -44,7 +43,7 @@ def test_reflective_band(reflective_band):
 
 
 def test_emissive_band(emissive_band):
-    actual = goes.GoesBand(dataset=emissive_band)
+    actual = goes_level_1.GoesBand(dataset=emissive_band)
     assert actual.parse().equals(actual.brightness_temperature)
     assert np.isnan(actual.brightness_temperature.data).sum() == 0
     np.testing.assert_array_equal(
@@ -53,40 +52,42 @@ def test_emissive_band(emissive_band):
 
 
 def test_filter_bad_pixels(emissive_band):
-    actual = goes.GoesBand(dataset=emissive_band).filter_bad_pixels()
-    assert isinstance(actual, goes.GoesBand)
+    actual = goes_level_1.GoesBand(dataset=emissive_band).filter_bad_pixels()
+    assert isinstance(actual, goes_level_1.GoesBand)
     assert (np.isnan(emissive_band.Rad.data).sum() == 0) & (
         np.isnan(actual.dataset.Rad).data.sum() > 0
     )
 
 
 def test_rescale_to_2km(reflective_band, emissive_band):
-    actual = goes.GoesBand(dataset=reflective_band).rescale_to_2km()
-    assert isinstance(actual, goes.GoesBand)
+    actual = goes_level_1.GoesBand(dataset=reflective_band).rescale_to_2km()
+    assert isinstance(actual, goes_level_1.GoesBand)
     assert actual.dataset.Rad.shape == (500, 500)
 
-    actual = goes.GoesBand(dataset=emissive_band).rescale_to_2km()
-    assert isinstance(actual, goes.GoesBand)
+    actual = goes_level_1.GoesBand(dataset=emissive_band).rescale_to_2km()
+    assert isinstance(actual, goes_level_1.GoesBand)
     assert actual.dataset.Rad.shape == (500, 500)
 
 
 def test_read_netcdf(wildfire_scan_filepaths):
-    actual = goes.read_netcdf(local_filepath=wildfire_scan_filepaths[0],)
-    assert isinstance(actual, goes.GoesBand)
+    actual = goes_level_1.read_netcdf(local_filepath=wildfire_scan_filepaths[0],)
+    assert isinstance(actual, goes_level_1.GoesBand)
 
 
 def test_normalize():
     x = np.array([1, 2, 3, 4, 5])
-    actual = normalize(data=x)
+    actual = goes_level_1.band.normalize(data=x)
     expected = st.zscore(x)
     np.testing.assert_array_equal(actual, expected)
 
 
 def test_get_goes_band_local(wildfire_scan_filepaths):
     local_filepath = wildfire_scan_filepaths[0]
-    region, channel, satellite, scan_time = goes.utilities.parse_filename(local_filepath)
+    region, channel, satellite, scan_time = goes_level_1.utilities.parse_filename(
+        local_filepath
+    )
 
-    actual = goes.get_goes_band(
+    actual = goes_level_1.get_goes_band(
         satellite="noaa-goes17",
         region=region,
         channel=channel,
@@ -94,7 +95,7 @@ def test_get_goes_band_local(wildfire_scan_filepaths):
         local_directory=os.path.join("tests", "resources", "test_scan_wildfire"),
         s3=False,
     )
-    assert isinstance(actual, goes.GoesBand)
+    assert isinstance(actual, goes_level_1.GoesBand)
     assert actual.band_id == channel
     assert actual.region == region
     assert actual.satellite == satellite

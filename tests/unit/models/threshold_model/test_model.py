@@ -1,14 +1,15 @@
 import numpy as np
 import pytest
 
-from wildfire import goes, wildfire
-from wildfire.threshold_model import model
+from wildfire import wildfire
+from wildfire.data import goes_level_1
+from wildfire.models import threshold_model
 
 
 def test_predict_wildfire(all_bands_wildfire):
-    wildfire_scan = goes.GoesScan(bands=all_bands_wildfire)
+    wildfire_scan = goes_level_1.GoesScan(bands=all_bands_wildfire)
     model_features = wildfire.get_model_features_goes(goes_scan=wildfire_scan)
-    actual_wildfire = model.predict(
+    actual_wildfire = threshold_model.predict(
         is_hot=model_features.is_hot,
         is_cloud=model_features.is_cloud,
         is_night=model_features.is_night,
@@ -18,9 +19,9 @@ def test_predict_wildfire(all_bands_wildfire):
 
 
 def test_predict_no_wildfire(all_bands_no_wildfire):
-    no_wildfire_scan = goes.GoesScan(bands=all_bands_no_wildfire)
+    no_wildfire_scan = goes_level_1.GoesScan(bands=all_bands_no_wildfire)
     model_features = wildfire.get_model_features_goes(goes_scan=no_wildfire_scan)
-    no_actual_wildfire = model.predict(
+    no_actual_wildfire = threshold_model.predict(
         is_hot=model_features.is_hot,
         is_cloud=model_features.is_cloud,
         is_night=model_features.is_night,
@@ -31,7 +32,7 @@ def test_predict_no_wildfire(all_bands_no_wildfire):
 
 def test_predict_bad_args():
     with pytest.raises(ValueError) as error_message:
-        model.predict(
+        threshold_model.predict(
             is_hot=np.ones(1),
             is_water=np.ones(2),
             is_night=np.ones(1),

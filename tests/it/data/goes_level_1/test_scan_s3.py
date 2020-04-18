@@ -16,7 +16,7 @@ def test_get_goes_scan_local():
             scan_time_utc=scan_time,
             local_directory=temporary_directory,
         )
-        assert isinstance(actual, goes.GoesScan)
+        assert isinstance(actual, scan.GoesScan)
         assert actual.region == region
         assert actual.satellite == "G17"
         assert actual.scan_time_utc.strftime("%Y-%j-%H:%M") == scan_time.strftime(

@@ -45,7 +45,11 @@ or the environment variables `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` set
 1. Make sure that all requirements above are installed
 1. `cp .sample_env .env` and fill out any `<>` blocks
 1. `set -o allexport && source .env && set +o allexport` to export environment variables
+<<<<<<< HEAD
 1. `source scripts/create-env` to install package and dependencies
+=======
+1. `scripts/install` to install package and dependencies
+>>>>>>> master
 1. `scripts/test-it` to verify install
 
 ## Entry Points
@@ -63,9 +67,12 @@ NAS.
 The command line interface for the library. Currently, this handles downloading and labeling wildfires
 in the GOES satellite data.
 
+<<<<<<< HEAD
 - `download --help`
 - `label --help`
 
+=======
+>>>>>>> master
 ## wildfire/goes/
 
 Utilities for using NOAA's GOES-16/17 satellite data, which is publicly accessible in

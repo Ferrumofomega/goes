@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 """Download wildfire data."""
 import logging
 import os
@@ -8,6 +9,13 @@ from mpi4py import MPI
 import numpy as np
 
 from wildfire.data.goes_level_1 import downloader
+=======
+import logging
+
+import click
+
+from wildfire.goes import downloader
+>>>>>>> master
 
 DATETIME_FORMATS = ["%Y-%m-%dT%H:%M:%S", "%Y-%m-%d"]
 
@@ -17,7 +25,10 @@ _logger = logging.getLogger(__name__)
 
 @click.group()
 def download():
+<<<<<<< HEAD
     """Download wildfire data."""
+=======
+>>>>>>> master
     pass
 
 

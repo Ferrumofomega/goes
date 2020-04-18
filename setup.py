@@ -20,8 +20,9 @@ setup(
     long_description="\n" + open("README.md").read(),
     entry_points={
         "console_scripts": [
-            "label=wildfire.cli.label:label",
+            "predict=wildfire.cli.predict:predict",
             "download=wildfire.cli.download:download",
+            "training-data=wildfire.cli.training_data:training_data",
         ]
     },
 )

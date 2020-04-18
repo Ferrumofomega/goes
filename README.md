@@ -67,12 +67,10 @@ NAS.
 The command line interface for the library. Currently, this handles downloading and labeling wildfires
 in the GOES satellite data.
 
-<<<<<<< HEAD
 - `download --help`
-- `label --help`
+- `predict --help`
+- `training-data --help`
 
-=======
->>>>>>> master
 ## wildfire/goes/
 
 Utilities for using NOAA's GOES-16/17 satellite data, which is publicly accessible in
@@ -103,7 +101,6 @@ If you are setting up your NAS environment for the first time please refer to
 [their documentation](https://www.nas.nasa.gov/hecc/support/kb/), or if you are looking
  for support please contact them for 24/7 service at 800-331-8737 or
  <support@nas.nasa.gov>.
-
 
 ## TODO
 

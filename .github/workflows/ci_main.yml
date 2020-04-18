@@ -23,7 +23,7 @@ jobs:
       run: |
         conda info --envs
         conda list
-        conda activate wildfire3.7
+        source activate wildfire3.7
         conda info --envs
         conda list
         scripts/test-it

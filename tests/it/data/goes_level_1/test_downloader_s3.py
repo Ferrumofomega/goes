@@ -4,7 +4,7 @@ import tempfile
 
 import s3fs
 
-from wildfire.goes import downloader, utilities
+from wildfire.data.goes_level_1 import downloader, utilities
 
 
 def test_list_s3_files():

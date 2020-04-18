@@ -1,7 +1,7 @@
 import datetime
 import tempfile
 
-from wildfire import goes
+from wildfire.data.goes_level_1 import scan
 
 
 def test_get_goes_scan_local():
@@ -10,7 +10,7 @@ def test_get_goes_scan_local():
     scan_time = datetime.datetime(2019, 1, 1, 1, 1)
 
     with tempfile.TemporaryDirectory() as temporary_directory:
-        actual = goes.get_goes_scan(
+        actual = scan.get_goes_scan(
             satellite=satellite,
             region=region,
             scan_time_utc=scan_time,

@@ -24,6 +24,7 @@ jobs:
         conda info --envs
         conda list
         conda init bash
+        exec bash
         conda activate wildfire3.7
         conda info --envs
         conda list

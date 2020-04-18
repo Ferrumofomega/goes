@@ -96,3 +96,16 @@ If you are setting up your NAS environment for the first time please refer to
 [their documentation](https://www.nas.nasa.gov/hecc/support/kb/), or if you are looking
  for support please contact them for 24/7 service at 800-331-8737 or
  <support@nas.nasa.gov>.
+
+
+## TODO
+
+- Work on test coverage
+- Make notebooks work
+- Run training data on NAS
+- Clean L2 documentation notebook
+- Add in DNN
+- Run DNN training on NAS
+- Make pylint and pydocstyle happy
+- Run DNN inference on NAS
+- Update all documentation

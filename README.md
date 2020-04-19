@@ -33,7 +33,7 @@ an isolated python environment. Below are several usefule commands for doing so 
 ### Requirements
 
 1. [Anaconda](https://docs.anaconda.com/anaconda/install/) or [Miniconda](https://docs.conda.io/en/latest/miniconda.html)
-    1. some packages like `mpi4py`, `pytorch`, and `cudatoolkit` are much much much more easily installed using conda.
+    1. some packages like `pytorch`, and `cudatoolkit` are much much much more easily installed using conda.
 
 1. To interact with S3 via [s3fs](https://s3fs.readthedocs.io/en/latest/)
 one either needs to have credentials stored at `~/.aws/credentials` (see
@@ -104,9 +104,7 @@ If you are setting up your NAS environment for the first time please refer to
 
 ## TODO
 
-- Think about using ray instead of mpi4py
 - Run training data on NAS
-- Clean L2 documentation notebook
 - Add in DNN
 - Run DNN training on NAS
 - Make pylint and pydocstyle happy

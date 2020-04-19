@@ -204,7 +204,11 @@ class GoesBand:
         GoesBand
             A `GoesBand` object where each band has been rescaled to 500 meters.
         """
-        if self.dataset.Rad.shape == (1500, 2500):  # if already at 2km resolution
+        if self.dataset.Rad.shape in (
+            (500, 500),  # 2km resolution at Mesoscale
+            (5424, 5424),  # 2km resolution at Full
+            (1500, 2500),  # 2km resolution at CONUS
+        ):  # if already at 2km resolution
             rescaled_data = self.dataset
         elif self.band_id in (1, 3, 5):
             rescaled_data = self.dataset.thin(2)  # 500m -> 2km

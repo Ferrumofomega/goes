@@ -45,17 +45,14 @@ or the environment variables `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` set
 1. Make sure that all requirements above are installed
 1. `cp .sample_env .env` and fill out any `<>` blocks
 1. `set -o allexport && source .env && set +o allexport` to export environment variables
-<<<<<<< HEAD
-1. `source scripts/create-env` to install package and dependencies
-=======
 1. `scripts/install` to install package and dependencies
->>>>>>> master
 1. `scripts/test-it` to verify install
 
 ## Entry Points
 
 - `download goes-level-1 2019-01-01 2019-01-02`
 - `label goes-threshold 2019-01-01 2019-01-02`
+- `training-data goes-l2-cnn /level_1_directory ./level_2_directory`
 
 ## documentation/
 

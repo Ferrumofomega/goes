@@ -18,48 +18,6 @@ def test_parse_filename():
     assert actual[3] == datetime.datetime(2019, 10, 27, 20, 48, 27, 500000)
 
 
-def _timer(index):
-    # This is used to test the multiprocessing functions.
-    # Unhappily, we have to define it here until we learn more about the problem.
-    time.sleep(1)
-    return index
-
-
-def test_starmap_function():
-    num_cores = multiprocessing.cpu_count()
-    if num_cores > 1:
-        started_at = datetime.datetime.utcnow()
-        actual = utilities.starmap_function(
-            _timer, np.expand_dims(np.arange(num_cores), axis=1)
-        )
-        assert len(actual) == num_cores
-
-        actual_elapsed_time = (datetime.datetime.utcnow() - started_at).total_seconds()
-        np.testing.assert_almost_equal(actual_elapsed_time, 1, decimal=0)
-
-
-def test_imap_function():
-    num_cores = multiprocessing.cpu_count()
-    if num_cores > 1:
-        started_at = datetime.datetime.utcnow()
-        actual = utilities.imap_function(_timer, list(range(num_cores)))
-        assert len(actual) == num_cores
-
-        actual_elapsed_time = (datetime.datetime.utcnow() - started_at).total_seconds()
-        np.testing.assert_almost_equal(actual_elapsed_time, 1, decimal=0)
-
-
-def test_map_function():
-    num_cores = multiprocessing.cpu_count()
-    if num_cores > 1:
-        started_at = datetime.datetime.utcnow()
-        actual = utilities.map_function(_timer, list(range(num_cores)))
-        assert len(actual) == num_cores
-
-        actual_elapsed_time = (datetime.datetime.utcnow() - started_at).total_seconds()
-        np.testing.assert_almost_equal(actual_elapsed_time, 1, decimal=0)
-
-
 def test_group_filepaths_into_scans(l1_wildfire_scan_filepaths):
     actual = utilities.group_filepaths_into_scans(filepaths=l1_wildfire_scan_filepaths)
     assert len(actual) == 1
@@ -151,3 +109,8 @@ def test_list_local_files(l1_wildfire_scan_filepaths):
         end_time=datetime.datetime(2019, 10, 27, 20, 1),
     )
     assert not set(actual) - set(l1_wildfire_scan_filepaths)
+
+
+def test_flatten_array():
+    actual = utilities.flatten_array([[1], [2], [3], [4]])
+    np.testing.assert_array_equal(actual, np.array([1, 2, 3, 4]))

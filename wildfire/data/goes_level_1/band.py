@@ -37,7 +37,6 @@ def get_goes_band(satellite, region, channel, scan_time_utc, local_directory, s3
         start_time=scan_time_utc,
         channel=channel,
     )
-
     if len(local_filepaths) == 1:
         return read_netcdf(local_filepath=local_filepaths[0])
 

@@ -2,6 +2,7 @@ import glob
 import os
 
 import pytest
+import ray
 import xarray as xr
 
 from wildfire.data import goes_level_1

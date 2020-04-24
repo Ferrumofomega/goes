@@ -1,4 +1,6 @@
-"""Utilities combining data and wildfire modelling."""
+"""Utilities combining goes level 1 data and wildfire modelling."""
+import datetime
+import json
 import logging
 import os
 
@@ -7,12 +9,15 @@ import numpy as np
 
 from wildfire import multiprocessing
 from wildfire.data import goes_level_1
-from wildfire.models import threshold_model
+from . import model as threshold_model
+
+WILDFIRE_FILENAME = "wildfires_{satellite}_{region}_s{start}_e{end}_c{created}.json"
+DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
 
 _logger = logging.getLogger(__name__)
 
 
-def find_wildfires_goes(filepaths):
+def find_wildfires(filepaths, pbs=False, **cluster_kwargs):
     """Find wildfires in goes scans found at `filepaths`.
 
     Organize filepaths into groups of scans and parse for wildfires.
@@ -42,7 +47,10 @@ def find_wildfires_goes(filepaths):
         "Processing %d scans with %d workers...", len(scan_filepaths), os.cpu_count()
     )
     wildfires = multiprocessing.map_function(
-        function=parse_scan_for_wildfire, function_args=[scan_filepaths]
+        function=parse_scan_for_wildfire,
+        function_args=[scan_filepaths],
+        pbs=pbs,
+        **cluster_kwargs,
     )
     wildfires = list(filter(None, wildfires))
 
@@ -80,7 +88,7 @@ def parse_scan_for_wildfire(filepaths):
         )
         return None
 
-    if predict_wildfires_goes(goes_scan=goes_scan).mean() > 0:
+    if predict_wildfires(goes_scan=goes_scan).mean() > 0:
         return {
             "scan_time_utc": goes_scan.scan_time_utc.strftime("%Y-%m-%dT%H:%M:%S%f"),
             "region": goes_scan.region,
@@ -89,7 +97,7 @@ def parse_scan_for_wildfire(filepaths):
     return None
 
 
-def get_model_features_goes(goes_scan):
+def get_model_features(goes_scan):
     """Calculate features of the threshold model from a `GoesScan`.
 
     To do this, the provided `GoesScan` is first rescaled such that all bands are in the
@@ -135,7 +143,7 @@ def get_model_features_goes(goes_scan):
     )
 
 
-def predict_wildfires_goes(goes_scan):
+def predict_wildfires(goes_scan):
     """Get model predictions for wildfire detection for a `GoesScan`.
 
     Parameters
@@ -147,7 +155,7 @@ def predict_wildfires_goes(goes_scan):
     np.ndarray of bool
         A prediction (True/False) of whether a wildfire is detected at each pixel.
     """
-    model_features = get_model_features_goes(goes_scan=goes_scan)
+    model_features = get_model_features(goes_scan=goes_scan)
     model_predictions = threshold_model.predict(
         is_hot=model_features.is_hot,
         is_cloud=model_features.is_cloud,
@@ -157,7 +165,7 @@ def predict_wildfires_goes(goes_scan):
     return model_predictions
 
 
-def plot_wildfires_goes(goes_scan):
+def plot_wildfires(goes_scan):
     """Highlight pixels of a wildfire and plot next to the provided GOES scan.
 
     Parameters
@@ -168,7 +176,7 @@ def plot_wildfires_goes(goes_scan):
     -------
     list of plt.image.AxesImage
     """
-    model_predictions = predict_wildfires_goes(goes_scan=goes_scan)
+    model_predictions = predict_wildfires(goes_scan=goes_scan)
 
     _, (axis_fire, axis_scan) = plt.subplots(ncols=2, figsize=(20, 8))
     axis_fire.set_title(f"Wildfire Present: {model_predictions.mean() > 0}", fontsize=20)
@@ -180,3 +188,42 @@ def plot_wildfires_goes(goes_scan):
     image_scan.axes.axis("off")
     plt.tight_layout()
     return [image_fire, image_scan]
+
+
+def label_wildfires(
+    scan_filepaths,
+    wildfire_directory,
+    satellite,
+    region,
+    start,
+    end,
+    pbs=False,
+    **cluster_kwargs,
+):
+    wildfires = multiprocessing.map_function(
+        function=parse_scan_for_wildfire,
+        function_args=[scan_filepaths],
+        pbs=pbs,
+        **cluster_kwargs,
+    )
+    wildfires = list(filter(None, wildfires))
+    _logger.info("Found %d wildfires.", len(wildfires))
+
+    if len(wildfires) > 0:
+        wildfires_filepath = os.path.join(
+            wildfire_directory,
+            WILDFIRE_FILENAME.format(
+                satellite=satellite,
+                region=region,
+                start=start.strftime(DATETIME_FORMAT),
+                end=end.strftime(DATETIME_FORMAT),
+                created=datetime.datetime.utcnow().strftime(DATETIME_FORMAT),
+            ),
+        )
+        _logger.info("Persisting wildfires to %s", wildfires_filepath)
+        with open(wildfires_filepath, "w+") as buffer:
+            json.dump(dict(enumerate(wildfires)), buffer)
+    else:
+        _logger.info("No wildfires found...")
+
+    return wildfires

@@ -1,4 +1,5 @@
 """Utilities for multiprocessing."""
+from contextlib import contextmanager
 import logging
 
 from dask.distributed import Client, LocalCluster, progress
@@ -9,33 +10,36 @@ _logger = logging.getLogger(__name__)
 
 
 def map_function(function, function_args, pbs=False, **cluster_kwargs):
-    dask_client = start_dask_client(pbs=pbs, **cluster_kwargs)
-
     _logger.info(
         "Running %s in parallel with args of shape %s",
         function.__name__,
         np.shape(function_args),
     )
+    with dask_client(pbs=pbs, **cluster_kwargs) as client:
+        if len(np.shape(function_args)) == 1:
+            function_args = [function_args]
 
-    if len(np.shape(function_args)) == 1:
-        function_args = [function_args]
+        futures = client.map(function, *function_args)
+        progress(futures)
+        return_values = client.gather(futures)
 
-    futures = dask_client.map(function, *function_args)
-    progress(futures)
-    return_values = dask_client.gather(futures)
-    dask_client.close()
     return return_values
 
 
-def start_dask_client(pbs=False, **cluster_kwargs):
+@contextmanager
+def dask_client(pbs=False, **cluster_kwargs):
     cluster = (
         PBSCluster(**cluster_kwargs)
         if pbs
         else LocalCluster(processes=False, **cluster_kwargs)
     )
     client = Client(cluster)
-    _logger.info("Dask Cluster: %s\nDask Client: %s", cluster, client)
-    return client
+    try:
+        _logger.info("Dask Cluster: %s\nDask Client: %s", cluster, client)
+        yield client
+
+    finally:
+        client.close()
 
 
 def flatten_array(arr):

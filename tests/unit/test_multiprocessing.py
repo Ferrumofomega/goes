@@ -16,6 +16,7 @@ def test_flatten_array():
 def test_start_dask_client():
     actual = multiprocessing.start_dask_client()
     assert isinstance(actual, dask.distributed.client.Client)
+    actual.close()
 
 
 def test_map_function():

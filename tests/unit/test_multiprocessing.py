@@ -31,5 +31,5 @@ def test_map_function():
     finished_at = datetime.datetime.utcnow()
 
     np.testing.assert_almost_equal(
-        (finished_at - started_at).total_seconds(), 2, decimal=1
+        (finished_at - started_at).total_seconds(), 2, decimal=0
     )

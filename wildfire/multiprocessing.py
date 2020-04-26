@@ -75,7 +75,8 @@ def dask_client(pbs=False, **cluster_kwargs):
     pbs: bool, optional
         Whether or not dask should submit a PBS job over whose cluster to operate.
     **cluster_kwargs:
-        Arguments to either `PBSCluster` or `LocalCluster` which are pretty much the same. Some usefule arguments include:
+        Arguments to either `PBSCluster` or `LocalCluster` which are pretty much the
+        same. Some usefule arguments include:
             - n_workers
             - cores
             - interface

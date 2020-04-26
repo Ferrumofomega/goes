@@ -94,6 +94,8 @@ def dask_client(pbs=False, **cluster_kwargs):
 
     finally:
         client.close()
+    _logger.info("Dask Cluster: %s\nDask Client: %s", cluster, client)
+    return client
 
 
 def flatten_array(arr):

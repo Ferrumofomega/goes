@@ -12,12 +12,12 @@ def test_flatten_array():
     actual = multiprocessing.flatten_array([[1], [2], [3], [4]])
     np.testing.assert_array_equal(actual, np.array([1, 2, 3, 4]))
 
-
+    
 def test_dask_client():
     with multiprocessing.dask_client() as client:
         assert isinstance(client, dask.distributed.client.Client)
 
-
+        
 def test_map_function():
     num_cpus = os.cpu_count()
 
